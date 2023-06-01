@@ -18,7 +18,7 @@ class MultiUserCKPT(scripts.Script):
         return scripts.AlwaysVisible
             
     def ui(self, is_img2img):
-        return [MultiUserCKPT.checkpoint, MultiUserCKPT.vae]
+        return [self.checkpoint, self.vae]
     
     def refresh_ckpts(self):
         refresh_checkpoints()
@@ -30,38 +30,38 @@ class MultiUserCKPT(scripts.Script):
     
     def before_component(self, component, **kwargs):
         if kwargs.get("label") == f"Sampling method":
-            MultiUserCKPT.checkpoint = gr.Dropdown(
+            self.checkpoint = gr.Dropdown(
                 elem_id="muc_checkpoint",
                 label="SD Checkpoint for you",
                 value="Do not change",
                 choices=["Do not change"]+list_checkpoint_tiles(),
                 interactive=True
             )
-            MultiUserCKPT.refresh_ckpt = ToolButton(value=refresh_symbol, elem_id="muc_refresh_ckpt")
-            MultiUserCKPT.refresh_ckpt.click(
+            self.refresh_ckpt = ToolButton(value=refresh_symbol, elem_id="muc_refresh_ckpt")
+            self.refresh_ckpt.click(
                 fn=self.refresh_ckpts,
                 inputs=[],
-                outputs=[MultiUserCKPT.checkpoint]
+                outputs=[self.checkpoint]
             )
             
-            MultiUserCKPT.vae = gr.Dropdown(
+            self.vae = gr.Dropdown(
                 elem_id="muc_vae",
                 label="SD VAE for you",
                 value="Do not change",
                 choices=["Do not change"]+sd_vae_items(),
                 interactive=True
             )
-            MultiUserCKPT.refresh_vae = ToolButton(value=refresh_symbol, elem_id="muc_refresh_vae")
-            MultiUserCKPT.refresh_vae.click(
+            self.refresh_vae = ToolButton(value=refresh_symbol, elem_id="muc_refresh_vae")
+            self.refresh_vae.click(
                 fn=self.refresh_vaes,
                 inputs=[],
-                outputs=[MultiUserCKPT.vae]
+                outputs=[self.vae]
             )
     
     def process(self, p, ckpt:str, vae:str):
-        if vae != opts.sd_vae:
+        if vae != opts.sd_vae and vae != "Do not change":
             opts.sd_vae = vae
-        if ckpt != opts.sd_model_checkpoint:
+        if ckpt != opts.sd_model_checkpoint and ckpt != "Do not change":
             opts.sd_model_checkpoint = ckpt
             load_model(checkpoint_info=select_checkpoint())
 
